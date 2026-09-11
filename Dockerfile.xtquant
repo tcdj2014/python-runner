@@ -1,0 +1,5 @@
+ARG BASE_IMAGE=ghcr.io/tcdj2014/python-runner:latest
+FROM ${BASE_IMAGE}
+
+ARG PACKAGE_NAME
+RUN python -m pip install --no-cache-dir "${PACKAGE_NAME}"

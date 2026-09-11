@@ -50,6 +50,17 @@ docker run --rm -v "${PWD}:/scripts" ghcr.io/OWNER/REPOSITORY:latest main.py
 
 仓库或组织需要允许 GitHub Actions 创建包。如果已有同名包，还需要授予本仓库对该包的写入权限。
 
+## XtQuant 扩展镜像
+
+`.github/workflows/docker-xtquant.yml` 会在基础镜像工作流成功后，构建并发布两个多架构镜像：
+
+```sh
+docker pull ghcr.io/tcdj2014/python-runner:xtquant-big-convert
+docker pull ghcr.io/tcdj2014/python-runner:xtquant-big-convert-redis
+```
+
+前者安装 `xtquant-big-convert`，后者安装 `xtquant-big-convert[redis]`。两个镜像都继承 `latest` 基础镜像的 Python 环境和国内 pip 源。
+
 ## 手动发布到阿里云镜像仓库（可选）
 
 需要 Docker Buildx，且构建器应支持这两种架构（通过原生节点或 QEMU 模拟）。Docker Desktop 通常已提供模拟支持。
