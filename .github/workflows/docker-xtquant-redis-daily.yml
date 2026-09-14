@@ -1,0 +1,45 @@
+name: Daily update XtQuant Redis image
+
+on:
+  schedule:
+    # 每天北京时间 04:00（UTC 20:00）运行
+    - cron: '0 20 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Redis image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.xtquant
+          build-args: PACKAGE_NAME=xtquant-big-convert[redis]
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:xtquant-big-convert-redis
+          cache-from: type=gha,scope=xtquant-big-convert-redis
+          cache-to: type=gha,mode=max,scope=xtquant-big-convert-redis
